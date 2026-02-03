@@ -134,9 +134,76 @@ warning deta hai ki clint has been logged out
 then hum teeno funcitons ko return krte hai taki bahar jha bhi ye use ho toh
 hum ye overridden wale funs use kre
 
- * 
- * 
- * 
- * 
- * 
  */
+
+//-----------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------
+
+
+/*
+DATABASE SCHEMA OVERVIEW
+
+This project uses PostgreSQL (Neon) with two core tables:
+1. matches
+2. commentary
+
+The schema is managed directly in Neon via SQL,
+not created at application runtime.
+
+TABLE: matches
+
+Purpose:
+Stores basic match information and current match state.
+
+Columns:
+- id            : Primary key
+- team_home     : Home team name
+- team_away     : Away team name
+- score_home    : Home team score (default 0)
+- score_away    : Away team score (default 0)
+- status        : Match status (scheduled | live | finished)
+- start_time    : Match start time
+- created_at    : Record creation timestamp
+- updated_at    : Record update timestamp
+
+Notes:
+- One row = one match
+- Parent table for commentary
+
+TABLE: commentary
+
+Purpose:
+Stores live commentary / events for matches.
+
+Columns:
+- id          : Primary key
+- match_id    : Foreign key → matches.id
+- message     : Commentary text
+- event_type  : Type of event (goal | save | kickoff | general)
+- minute      : Match minute when event occurred
+- created_at  : Timestamp of event creation
+
+Notes:
+- Multiple rows per match
+- ON DELETE CASCADE ensures commentary is deleted if match is removed
+
+INDEXES
+
+idx_commentary_match_id
+- Optimizes queries fetching commentary for a specific match
+
+idx_commentary_created_at
+- Optimizes ordering commentary by latest events
+
+- Schema is created and managed directly in Neon SQL editor
+- Application code only runs queries (no table creation at runtime)
+- Connection pooling is handled via pg Pool
+- Transactions use a single client from the pool when required
+
+QUERY USAGE GUIDELINES
+
+- Use pool.query() for single, independent queries
+- Use getClient() for transactions or multiple dependent queries
+- Always release the client after transaction completion
+*/
