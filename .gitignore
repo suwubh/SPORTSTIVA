@@ -1,0 +1,23 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.*
+
+# Node modules (fallback, but we’ll also ignore inside subfolders)
+node_modules/
+
+# Build folders
+dist/
+build/
+
+# VS Code settings
+.vscode/
+
+# Coverage
+coverage/
