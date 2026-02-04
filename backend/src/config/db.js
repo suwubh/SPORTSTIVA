@@ -154,47 +154,59 @@ not created at application runtime.
 TABLE: matches
 
 Purpose:
-Stores basic match information and current match state.
+Stores core match metadata and the current state of a sports match.
 
 Columns:
-- id            : Primary key
-- team_home     : Home team name
-- team_away     : Away team name
-- score_home    : Home team score (default 0)
-- score_away    : Away team score (default 0)
-- status        : Match status (scheduled | live | finished)
-- start_time    : Match start time
-- created_at    : Record creation timestamp
-- updated_at    : Record update timestamp
+
+id : Primary key
+sport : Sport type (e.g., football, cricket)
+home_team : Home team name
+away_team : Away team name
+home_score : Home team score (default 0)
+away_score : Away team score (default 0)
+status : Match status (scheduled | live | completed | cancelled)
+start_time : Match start time
+end_time : Match end time
+created_at : Record creation timestamp
 
 Notes:
-- One row = one match
-- Parent table for commentary
+One row represents one match
+Acts as the parent table for commentary
+Match lifecycle is driven via the status column
 
 TABLE: commentary
 
 Purpose:
-Stores live commentary / events for matches.
+Stores live commentary and event-level data for matches.
 
 Columns:
-- id          : Primary key
-- match_id    : Foreign key → matches.id
-- message     : Commentary text
-- event_type  : Type of event (goal | save | kickoff | general)
-- minute      : Match minute when event occurred
-- created_at  : Timestamp of event creation
+
+id : Primary key
+match_id : Foreign key → matches.id
+minute : Match minute when the event occurred
+sequence : Ordering of events within the same minute
+period : Match phase (e.g., first_half, second_half, overtime)
+event_type : Type of event (goal, foul, kickoff, general, etc.)
+actor : Player or entity responsible for the event
+team : Team associated with the event
+message : Commentary text (required)
+metadata : JSON payload for additional event data
+tags : Array of labels for filtering/classification
+created_at : Timestamp when the commentary entry was created
 
 Notes:
-- Multiple rows per match
-- ON DELETE CASCADE ensures commentary is deleted if match is removed
 
-INDEXES
+Multiple commentary rows can belong to a single match
+ON DELETE CASCADE ensures commentary is removed if its match is deleted
+Designed for real-time inserts during live matches
+
+INDEXES:-
 
 idx_commentary_match_id
-- Optimizes queries fetching commentary for a specific match
+Optimizes fetching all commentary for a specific match
 
 idx_commentary_created_at
-- Optimizes ordering commentary by latest events
+Optimizes ordering commentary by time (latest-first feeds)
 
 - Schema is created and managed directly in Neon SQL editor
 - Application code only runs queries (no table creation at runtime)
