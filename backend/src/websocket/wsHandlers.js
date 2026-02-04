@@ -1,7 +1,7 @@
 // src/websocket/wsHandlers.js
 // WebSocket connection handlers and message processing logic
 
-const { validateMessage, sanitizeData } = require("./wsValidation");
+import { validateMessage, sanitizeData } from "./wsValidation.js";
 
 /**
  * Store active WebSocket connections
@@ -23,7 +23,7 @@ let clientIdCounter = 0;
  * @param {WebSocket} ws - WebSocket client connection
  * @param {Request} req - HTTP request object
  */
-const handleConnection = (ws, req) => {
+const handleConnection = (ws) => {
   // Generate unique client ID
   const clientId = `client-${++clientIdCounter}`;
 
@@ -320,7 +320,7 @@ const getStats = () => {
   };
 };
 
-module.exports = {
+export {
   handleConnection,
   broadcastToMatch,
   broadcastToAll,

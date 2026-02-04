@@ -1,8 +1,8 @@
 // src/websocket/wsServer.js
 // WebSocket server initialization with heartbeat and health monitoring
 
-const WebSocket = require("ws");
-const { handleConnection, clients } = require("./wsHandlers");
+import { Server } from "ws";
+import { handleConnection, clients } from "./wsHandlers.js";
 
 /**
  * Initialize WebSocket Server
@@ -11,7 +11,7 @@ const { handleConnection, clients } = require("./wsHandlers");
  */
 const initWebSocketServer = (server) => {
   // Create WebSocket server
-  const wss = new WebSocket.Server({
+  const wss = new Server({
     server,
     // Path for WebSocket connections
     path: "/ws",
@@ -114,13 +114,17 @@ const shutdownWebSocketServer = (wss) => {
 
   // Close all active connections
   clients.forEach((clientData, ws) => {
-    ws.send(
-      JSON.stringify({
-        type: "server_shutdown",
-        message: "Server is shutting down",
-      }),
-    );
-    ws.close(1001, "Server shutting down");
+    if (ws.readyState === 1) {
+      ws.send(
+        JSON.stringify({
+          type: "server_shutdown",
+          message: "Server is shutting down",
+        }),
+      );
+      ws.close(1001, "Server shutting down");
+    } else {
+      ws.terminate();
+    }
   });
 
   // Close the server
@@ -129,7 +133,7 @@ const shutdownWebSocketServer = (wss) => {
   });
 };
 
-module.exports = {
+export default {
   initWebSocketServer,
   shutdownWebSocketServer,
 };
