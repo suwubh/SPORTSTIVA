@@ -101,6 +101,7 @@ module.exports = {
 };
 
 /**
+ * 
  * basically isme ho kya rha hai ki in postgress we have methods/functions
  * like query jo ki use hote hai query(GET * FROM TABLE1), getclient()
  * aur pool
@@ -122,6 +123,7 @@ COMMIT;
 Pool’s query() cannot guarantee the same connection is used each time.
 getClient() can.
 
+
 now hum kya kree hai is that we are monkey patching orr overidding the 
 already 3 functions of pool
 and hum usme error handling and timeouts add krre hai
@@ -140,3 +142,10 @@ hum ye overridden wale funs use kre
  * 
  * 
  */
+
+
+
+
+
+
+
