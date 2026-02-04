@@ -71,21 +71,21 @@ const validateHeartbeatMessage = (message) => {
  * @returns {Object} - Validation result with parsed message
  */
 const validateMessage = (rawMessage) => {
-  // Check if message is valid JSON
-  if (!isValidJSON(rawMessage)) {
-    return {
-      valid: false,
-      error: "Invalid JSON format",
-    };
-  }
-
-  const message = JSON.parse(rawMessage);
-
   // Check message size (prevent abuse)
   if (rawMessage.length > 10000) {
     return {
       valid: false,
       error: "Message too large",
+    };
+  }
+
+  let message;
+  try {
+    message = JSON.parse(rawMessage);
+  } catch (e) {
+    return {
+      valid: false,
+      error: "Invalid JSON format",
     };
   }
 
@@ -119,6 +119,14 @@ const sanitizeData = (data) => {
     return data.replace(/[<>]/g, "");
   }
 
+  if (Array.isArray(data)) {
+    return data.map((item) => sanitizeData(item));
+  }
+
+  if (data instanceof Date) {
+    return data.toISOString();
+  }
+
   if (typeof data === "object" && data !== null) {
     const sanitized = {};
     for (const key in data) {
@@ -130,8 +138,4 @@ const sanitizeData = (data) => {
   return data;
 };
 
-module.exports = {
-  validateMessage,
-  sanitizeData,
-  isValidJSON,
-};
+export { validateMessage, sanitizeData, isValidJSON };

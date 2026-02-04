@@ -11,8 +11,11 @@
  * @param {Function} next - Next middleware function
  */
 const errorHandler = (err, req, res, next) => {
-  // Log error details
-  console.error("❌ Error occurred:");
+  if (res.headersSent) {
+    return next(err);
+  }
+
+  console.error("Error occurred:");
   console.error("Path:", req.path);
   console.error("Method:", req.method);
   console.error("Error:", err);
@@ -47,7 +50,4 @@ const notFoundHandler = (req, res) => {
   });
 };
 
-module.exports = {
-  errorHandler,
-  notFoundHandler,
-};
+export { errorHandler, notFoundHandler };

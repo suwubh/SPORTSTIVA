@@ -1,7 +1,7 @@
 // src/models/Match.js
 // Database model for match operations (CRUD operations)
 
-const { query } = require("../config/database");
+import { query } from "../config/db.js";
 
 /**
  * Match Model
@@ -45,12 +45,20 @@ class Match {
    * @param {Object} matchData - Match data
    * @returns {Promise<Object>} - Created match object
    */
-  static async create({ team_home, team_away, start_time }) {
+  static async create({
+    home_team,
+    away_team,
+    team_home,
+    team_away,
+    start_time,
+  }) {
+    const resolvedHomeTeam = home_team ?? team_home;
+    const resolvedAwayTeam = away_team ?? team_away;
     const result = await query(
-      `INSERT INTO matches (team_home, team_away, start_time, status)
+      `INSERT INTO matches (home_team, away_team, start_time, status)
        VALUES ($1, $2, $3, 'scheduled')
        RETURNING *`,
-      [team_home, team_away, start_time || new Date()],
+      [resolvedHomeTeam, resolvedAwayTeam, start_time || new Date()],
     );
     return result.rows[0];
   }
@@ -61,13 +69,20 @@ class Match {
    * @param {Object} scoreData - Score data
    * @returns {Promise<Object>} - Updated match object
    */
-  static async updateScore(id, { score_home, score_away }) {
+  static async updateScore(id, {
+    home_score,
+    away_score,
+    score_home,
+    score_away,
+  }) {
+    const resolvedHomeScore = home_score ?? score_home;
+    const resolvedAwayScore = away_score ?? score_away;
     const result = await query(
       `UPDATE matches 
-       SET score_home = $1, score_away = $2, updated_at = CURRENT_TIMESTAMP
+       SET home_score = $1, away_score = $2
        WHERE id = $3
        RETURNING *`,
-      [score_home, score_away, id],
+      [resolvedHomeScore, resolvedAwayScore, id],
     );
     return result.rows[0];
   }
@@ -81,7 +96,7 @@ class Match {
   static async updateStatus(id, status) {
     const result = await query(
       `UPDATE matches 
-       SET status = $1, updated_at = CURRENT_TIMESTAMP
+       SET status = $1
        WHERE id = $2
        RETURNING *`,
       [status, id],
@@ -139,7 +154,7 @@ class Match {
    */
   static async getRecentCommentary(limit = 20) {
     const result = await query(
-      `SELECT c.*, m.team_home, m.team_away 
+      `SELECT c.*, m.home_team, m.away_team 
        FROM commentary c
        JOIN matches m ON c.match_id = m.id
        ORDER BY c.created_at DESC
@@ -164,12 +179,12 @@ class Match {
   }
 }
 
-module.exports = Match;
+export default Match;
 
 
 
  /**
-  * yha basically humlogo ne sql queries ke lie function banae hai taki use bhr use kr sake
+  * yha basically humlogo ne sql queries ke lie function banae hai taki use bahar use kr sake
   * 
   * example
   * 

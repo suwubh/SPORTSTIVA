@@ -1,8 +1,10 @@
 // src/config/database.js
 // PostgreSQL database configuration and connection pool setup
 
-const { Pool } = require("pg");
-require("dotenv").config();
+import { Pool } from "pg";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 /**
  * PostgreSQL Connection Pool
@@ -11,7 +13,7 @@ require("dotenv").config();
  */
 const pool = new Pool({
   host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
+  port: process.env.DB_PORT ? Number(process.env.DB_PORT) : undefined,
   database: process.env.DB_NAME,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
@@ -94,11 +96,7 @@ const getClient = async () => {
   return client;
 };
 
-module.exports = {
-  query,
-  getClient,
-  pool,
-};
+export { query, getClient, pool };
 
 /**
  * 
